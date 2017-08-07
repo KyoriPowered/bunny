@@ -27,17 +27,23 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import net.kyori.membrane.facet.Connectable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import static com.google.common.base.Preconditions.checkState;
+
 @Singleton
 public class Bunny implements Connectable {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(Bunny.class);
   private final BunnyConfiguration config;
   private Connection connection;
   @Nullable private Channel channel;
@@ -45,6 +51,12 @@ public class Bunny implements Connectable {
   @Inject
   private Bunny(final BunnyConfiguration config) {
     this.config = config;
+  }
+
+  @Nonnull
+  public Channel channel() {
+    checkState(this.channel != null, "bunny has not been connected");
+    return this.channel;
   }
 
   @Override
@@ -56,6 +68,7 @@ public class Bunny implements Connectable {
     factory.setAutomaticRecoveryEnabled(this.config.automaticRecovery());
     factory.setNetworkRecoveryInterval(this.config.automaticRecoveryInterval());
     factory.setTopologyRecoveryEnabled(this.config.topologyRecovery());
+    LOGGER.debug("Connecting to '{}'", this.config.addresses());
     this.connection = factory.newConnection(this.config.addresses());
     this.channel = this.connection.createChannel();
   }
@@ -63,6 +76,7 @@ public class Bunny implements Connectable {
   @Override
   public void disconnect() throws IOException, TimeoutException {
     if(this.channel != null) {
+      LOGGER.debug("Disconnecting from {}", this.connection.toString());
       this.channel.close();
       this.connection.close();
     }
