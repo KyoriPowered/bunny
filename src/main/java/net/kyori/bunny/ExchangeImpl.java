@@ -127,7 +127,7 @@ abstract class ExchangeImpl implements Connectable, Exchange {
 
   @Override
   public void connect() throws IOException, TimeoutException {
-    LOGGER.debug("Declaring exchange '{}'", this);
+    LOGGER.info("Declaring exchange '{}'", this);
     this.bunny.channel().exchangeDeclare(this.name, this.type, this.durable, this.autoDelete, this.internal, this.arguments);
   }
 

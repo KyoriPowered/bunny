@@ -76,7 +76,7 @@ public class Bunny implements Connectable {
     factory.setAutomaticRecoveryEnabled(this.config.automaticRecovery());
     factory.setNetworkRecoveryInterval(this.config.automaticRecoveryInterval());
     factory.setTopologyRecoveryEnabled(this.config.topologyRecovery());
-    LOGGER.debug("Connecting to '{}'", this.config.addresses());
+    LOGGER.info("Connecting to '{}'", this.config.addresses());
     this.connection = factory.newConnection(this.config.addresses());
     this.channel = this.connection.createChannel();
   }
@@ -84,7 +84,7 @@ public class Bunny implements Connectable {
   @Override
   public void disconnect() throws IOException, TimeoutException {
     if(this.channel != null) {
-      LOGGER.debug("Disconnecting from {}", this.connection.toString());
+      LOGGER.info("Disconnecting from {}", this.connection.toString());
       this.channel.close();
       this.connection.close();
     }

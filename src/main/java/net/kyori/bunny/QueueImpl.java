@@ -113,16 +113,16 @@ abstract class QueueImpl implements Connectable, Queue {
 
   @Override
   public void connect() throws IOException, TimeoutException {
-    LOGGER.debug("Declaring queue '{}'", this);
+    LOGGER.info("Declaring queue '{}'", this);
     this.bunny.channel().queueDeclare(this.name, this.durable, this.exclusive, this.autoDelete, this.arguments);
     this.consumerTag = this.bunny.channel().basicConsume(this.name, false, "", false, true, null, new ConsumerImpl());
-    LOGGER.debug("Starting consume on '{}' with tag '{}'", this, this.consumerTag);
+    LOGGER.info("Starting consume on '{}' with tag '{}'", this, this.consumerTag);
   }
 
   @Override
   public void disconnect() throws IOException, TimeoutException {
     if(this.consumerTag != null) {
-      LOGGER.debug("Cancelling consume on '{}' with tag '{}'", this, this.consumerTag);
+      LOGGER.info("Cancelling consume on '{}' with tag '{}'", this, this.consumerTag);
       this.bunny.channel().basicCancel(this.consumerTag);
     }
   }
@@ -130,7 +130,7 @@ abstract class QueueImpl implements Connectable, Queue {
   @Override
   public void bind(@Nonnull final Exchange exchange, @Nonnull final String routingKey) {
     try {
-      LOGGER.debug("Binding queue '{}' to exchange '{}' with routing key '{}'", this, exchange, routingKey);
+      LOGGER.info("Binding queue '{}' to exchange '{}' with routing key '{}'", this, exchange, routingKey);
       this.bunny.channel().queueBind(this.name, exchange.name(), routingKey, null);
     } catch(final IOException e) {
       e.printStackTrace();
@@ -140,7 +140,7 @@ abstract class QueueImpl implements Connectable, Queue {
   @Override
   public void unbind(@Nonnull final Exchange exchange, @Nonnull final String routingKey) {
     try {
-      LOGGER.debug("Unbinding queue '{}' from exchange '{}' with routing key '{}'", this, exchange, routingKey);
+      LOGGER.info("Unbinding queue '{}' from exchange '{}' with routing key '{}'", this, exchange, routingKey);
       this.bunny.channel().queueUnbind(this.name, exchange.name(), routingKey, null);
     } catch(final IOException e) {
       e.printStackTrace();
