@@ -23,23 +23,20 @@
  */
 package net.kyori.bunny;
 
-import com.google.common.base.MoreObjects;
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.BuiltinExchangeType;
+import net.kyori.bunny.message.Message;
 import net.kyori.lunar.Nameable;
-import net.kyori.membrane.facet.Connectable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
  * Represents an AMQP exchange.
+ *
+ * <p>Extend {@link Impl} instead of implementing this interface.</p>
  */
 public interface Exchange extends Nameable {
 
@@ -83,37 +80,48 @@ public interface Exchange extends Nameable {
   Map<String, Object> arguments();
 
   /**
+   * Publish a message to this exchange.
+   *
+   * @param message the message
+   * @param routingKey the routing key
+   * @param properties the properties
+   */
+  default void publish(@Nonnull final Message message, final String routingKey, final AMQP.BasicProperties properties) {
+    this.publish(message, routingKey, false, false, properties);
+  }
+
+  /**
+   * Publish a message to this exchange.
+   *
+   * @param message the message
+   * @param routingKey the routing key
+   * @param mandatory if the {@code mandatory} flag should be set
+   * @param immediate if the {@code immediate} flag should be set
+   * @param properties the properties
+   */
+  void publish(@Nonnull final Message message, final String routingKey, final boolean mandatory, final boolean immediate, final AMQP.BasicProperties properties);
+
+  /**
    * An abstract implementation of an exchange.
    */
-  abstract class Impl implements Connectable, Exchange {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Exchange.class);
-    @Nonnull private final Bunny bunny;
-    @Nonnull private final String name;
-    @Nonnull private final String type;
-    private final boolean durable;
-    private final boolean autoDelete;
-    private final boolean internal;
-    @Nullable private final Map<String, Object> arguments;
+  abstract class Impl extends ExchangeImpl {
 
     /**
      * Constructs a new exchange.
      *
-     * @param bunny bunny
      * @param name the exchange name
      * @param type the exchange type
      * @param durable if the exchange should be durable (survive a server restart)
      * @param autoDelete if this exchange should auto-delete when no longer in use
      * @param internal if this exchange is internal (can't be directly published to by a client)
      */
-    protected Impl(@Nonnull final Bunny bunny, @Nonnull final String name, @Nonnull final BuiltinExchangeType type, final boolean durable, final boolean autoDelete, final boolean internal) {
-      this(bunny, name, type, durable, autoDelete, internal, null);
+    protected Impl(@Nonnull final String name, @Nonnull final BuiltinExchangeType type, final boolean durable, final boolean autoDelete, final boolean internal) {
+      super(name, type, durable, autoDelete, internal, null);
     }
 
     /**
      * Constructs a new exchange.
      *
-     * @param bunny bunny
      * @param name the exchange name
      * @param type the exchange type
      * @param durable if the exchange should be durable (survive a server restart)
@@ -121,28 +129,26 @@ public interface Exchange extends Nameable {
      * @param internal if this exchange is internal (can't be directly published to by a client)
      * @param arguments other construction arguments
      */
-    protected Impl(@Nonnull final Bunny bunny, @Nonnull final String name, @Nonnull final BuiltinExchangeType type, final boolean durable, final boolean autoDelete, final boolean internal, @Nullable final Map<String, Object> arguments) {
-      this(bunny, name, type.getType(), durable, autoDelete, internal, arguments);
+    protected Impl(@Nonnull final String name, @Nonnull final BuiltinExchangeType type, final boolean durable, final boolean autoDelete, final boolean internal, @Nullable final Map<String, Object> arguments) {
+      super(name, type, durable, autoDelete, internal, arguments);
     }
 
     /**
      * Constructs a new exchange.
      *
-     * @param bunny bunny
      * @param name the exchange name
      * @param type the exchange type
      * @param durable if the exchange should be durable (survive a server restart)
      * @param autoDelete if this exchange should auto-delete when no longer in use
      * @param internal if this exchange is internal (can't be directly published to by a client)
      */
-    protected Impl(@Nonnull final Bunny bunny, @Nonnull final String name, @Nonnull final String type, final boolean durable, final boolean autoDelete, final boolean internal) {
-      this(bunny, name, type, durable, autoDelete, internal, null);
+    protected Impl(@Nonnull final String name, @Nonnull final String type, final boolean durable, final boolean autoDelete, final boolean internal) {
+      super(name, type, durable, autoDelete, internal, null);
     }
 
     /**
      * Constructs a new exchange.
      *
-     * @param bunny bunny
      * @param name the exchange name
      * @param type the exchange type
      * @param durable if the exchange should be durable (survive a server restart)
@@ -150,69 +156,8 @@ public interface Exchange extends Nameable {
      * @param internal if this exchange is internal (can't be directly published to by a client)
      * @param arguments other construction arguments
      */
-    protected Impl(@Nonnull final Bunny bunny, @Nonnull final String name, @Nonnull final String type, final boolean durable, final boolean autoDelete, final boolean internal, @Nullable final Map<String, Object> arguments) {
-      this.bunny = bunny;
-      this.name = name;
-      this.type = type;
-      this.durable = durable;
-      this.autoDelete = autoDelete;
-      this.internal = internal;
-      this.arguments = arguments;
-    }
-
-    @Nonnull
-    @Override
-    public String name() {
-      return this.name;
-    }
-
-    @Nonnull
-    @Override
-    public String type() {
-      return this.type;
-    }
-
-    @Override
-    public boolean durable() {
-      return this.durable;
-    }
-
-    @Override
-    public boolean autoDelete() {
-      return this.autoDelete;
-    }
-
-    @Override
-    public boolean internal() {
-      return this.internal;
-    }
-
-    @Nullable
-    @Override
-    public Map<String, Object> arguments() {
-      return this.arguments != null ? Collections.unmodifiableMap(this.arguments) : null;
-    }
-
-    @Override
-    public void connect() throws IOException, TimeoutException {
-      LOGGER.debug("Declaring exchange '{}'", this);
-      this.bunny.channel().exchangeDeclare(this.name, this.type, this.durable, this.autoDelete, this.internal, this.arguments);
-    }
-
-    @Override
-    public void disconnect() throws IOException, TimeoutException {
-    }
-
-    @Override
-    public String toString() {
-      return MoreObjects.toStringHelper(this)
-        .add("name", this.name)
-        .add("type", this.type)
-        .add("durable", this.durable)
-        .add("autoDelete", this.autoDelete)
-        .add("internal", this.internal)
-        .add("arguments", this.arguments)
-        .toString();
+    protected Impl(@Nonnull final String name, @Nonnull final String type, final boolean durable, final boolean autoDelete, final boolean internal, @Nullable final Map<String, Object> arguments) {
+      super(name, type, durable, autoDelete, internal, arguments);
     }
   }
 }

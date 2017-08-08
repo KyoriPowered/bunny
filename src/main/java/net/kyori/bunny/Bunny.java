@@ -40,6 +40,9 @@ import javax.inject.Singleton;
 
 import static com.google.common.base.Preconditions.checkState;
 
+/**
+ * The entry point to Bunny.
+ */
 @Singleton
 public class Bunny implements Connectable {
 
@@ -53,6 +56,11 @@ public class Bunny implements Connectable {
     this.config = config;
   }
 
+  /**
+   * Gets the channel.
+   *
+   * @return the channel
+   */
   @Nonnull
   public Channel channel() {
     checkState(this.channel != null, "bunny has not been connected");
