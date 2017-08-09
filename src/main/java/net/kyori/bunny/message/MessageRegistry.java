@@ -57,7 +57,7 @@ public class MessageRegistry {
   @Inject
   private MessageRegistry(final Set<MessageMeta<? extends Message>> messages) {
     messages.forEach(meta -> {
-      this.id.put(meta.id(), meta);
+      this.id.put(meta.name(), meta);
       this.type.put(meta.type(), meta);
     });
   }
@@ -85,7 +85,7 @@ public class MessageRegistry {
    */
   @Nonnull
   public String id(@Nonnull final Class<? extends Message> klass) {
-    return checkNotNull(this.type.get(klass), "metadata for '%s'", klass.getName()).id();
+    return checkNotNull(this.type.get(klass), "metadata for '%s'", klass.getName()).name();
   }
 
   private <M extends Message> MessageMeta<M> find(@Nonnull final Class<? extends Message> klass) {

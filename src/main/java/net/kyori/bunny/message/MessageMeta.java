@@ -38,17 +38,17 @@ public final class MessageMeta<M extends Message> {
    */
   @Nonnull private final Class<M> type;
   /**
-   * The message id.
+   * The message name.
    *
-   * <p>This is either the value of {@link Message.Id}, or the {@link Class#getSimpleName() simple name}.</p>
+   * <p>This is either the value of {@link Message.Name}, or the {@link Class#getSimpleName() simple name}.</p>
    */
-  @Nonnull private final String id;
+  @Nonnull private final String name;
 
   MessageMeta(@Nonnull final Class<M> type) {
     this.type = type;
 
-    @Nullable final Message.Id id = type.getAnnotation(Message.Id.class);
-    this.id = id != null ? id.value() : type.getSimpleName();
+    @Nullable final Message.Name name = type.getAnnotation(Message.Name.class);
+    this.name = name != null ? name.value() : type.getSimpleName();
   }
 
   /**
@@ -62,12 +62,12 @@ public final class MessageMeta<M extends Message> {
   }
 
   /**
-   * Gets the message id.
+   * Gets the message name.
    *
-   * @return the message id
+   * @return the message name
    */
   @Nonnull
-  public String id() {
-    return this.id;
+  public String name() {
+    return this.name;
   }
 }

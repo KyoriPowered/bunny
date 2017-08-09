@@ -42,7 +42,7 @@ public interface Message extends Document {
   @Documented
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.TYPE)
-  @interface Id {
+  @interface Name {
 
     String value();
   }
