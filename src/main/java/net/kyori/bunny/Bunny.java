@@ -56,6 +56,10 @@ public class Bunny implements Connectable {
     this.config = config;
   }
 
+  final boolean active() {
+    return this.channel != null;
+  }
+
   /**
    * Gets the channel.
    *
@@ -86,7 +90,9 @@ public class Bunny implements Connectable {
     if(this.channel != null) {
       LOGGER.info("Disconnecting from {}", this.connection.toString());
       this.channel.close();
+      this.channel = null;
       this.connection.close();
+      this.connection = null;
     }
   }
 }

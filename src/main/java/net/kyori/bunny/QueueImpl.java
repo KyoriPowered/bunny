@@ -121,7 +121,7 @@ abstract class QueueImpl implements Connectable, Queue {
 
   @Override
   public void disconnect() throws IOException, TimeoutException {
-    if(this.consumerTag != null) {
+    if(this.consumerTag != null && this.bunny.active()) {
       LOGGER.info("Cancelling consume on '{}' with tag '{}'", this, this.consumerTag);
       this.bunny.channel().basicCancel(this.consumerTag);
     }
@@ -133,7 +133,7 @@ abstract class QueueImpl implements Connectable, Queue {
       LOGGER.info("Binding queue '{}' to exchange '{}' with routing key '{}'", this, exchange, routingKey);
       this.bunny.channel().queueBind(this.name, exchange.name(), routingKey, null);
     } catch(final IOException e) {
-      e.printStackTrace();
+      LOGGER.error("Exception binding queue", e);
     }
   }
 
@@ -143,7 +143,7 @@ abstract class QueueImpl implements Connectable, Queue {
       LOGGER.info("Unbinding queue '{}' from exchange '{}' with routing key '{}'", this, exchange, routingKey);
       this.bunny.channel().queueUnbind(this.name, exchange.name(), routingKey, null);
     } catch(final IOException e) {
-      e.printStackTrace();
+      LOGGER.error("Exception unbinding queue", e);
     }
   }
 
