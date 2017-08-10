@@ -43,6 +43,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.Nonnull;
 
@@ -74,11 +75,13 @@ public final class DocumentDeserializer<D extends Document> extends JsonDeserial
     for(final Map.Entry<String, DocumentMeta.Field<?>> entry : meta.fields.entrySet()) {
       final String name = entry.getKey();
       final Class<?> type = TypeToken.of(entry.getValue().type()).getRawType();
+      final Object value;
       if(Document.class.isAssignableFrom(type)) {
-        fields.put(name, this.deserialize0(this.registry.meta(type.asSubclass(Document.class)), node.get(name), parser));
+        value = this.deserialize0(this.registry.meta(type.asSubclass(Document.class)), node.get(name), parser);
       } else {
-        fields.put(name, this.parser(node.get(name), parser.getCodec()).readValueAs(type));
+        value = this.parser(node.get(name), parser.getCodec()).readValueAs(type);
       }
+      fields.put(name, entry.getValue() instanceof DocumentMeta.OptionalField ? Optional.ofNullable(value) : value);
     }
     return this.createDocument(meta, fields);
   }

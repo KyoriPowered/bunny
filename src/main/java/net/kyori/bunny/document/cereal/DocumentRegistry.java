@@ -46,7 +46,7 @@ final class DocumentRegistry {
       if(!Document.class.isAssignableFrom(method.getDeclaringClass())) {
         continue;
       }
-      getters.put(method.getName(), new DocumentMeta.Field<>(method));
+      getters.put(method.getName(), DocumentMeta.Field.create(method));
     }
     return new DocumentMeta<>(type, getters);
   });

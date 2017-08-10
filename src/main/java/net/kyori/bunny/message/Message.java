@@ -44,6 +44,11 @@ public interface Message extends Document {
   @Target(ElementType.TYPE)
   @interface Name {
 
+    /**
+     * Gets the name of the message.
+     *
+     * @return the name
+     */
     String value();
   }
 }

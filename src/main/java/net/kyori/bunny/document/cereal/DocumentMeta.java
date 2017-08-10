@@ -28,8 +28,10 @@ import net.kyori.lunar.exception.Exceptions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -59,9 +61,17 @@ final class DocumentMeta<D extends Document> {
    * While this class is called Field it actually represents a Method which is used to obtain type information
    * during deserialization, and the value of calling the method during serialization.
    */
-  static final class Field<T> {
+  static class Field<T> {
 
     private final Method method;
+
+    public static <T> Field<T> create(final Method method) {
+      final Type grt = method.getGenericReturnType();
+      if(grt instanceof ParameterizedType && ((ParameterizedType) grt).getRawType().equals(Optional.class)) {
+        return new OptionalField<>(method);
+      }
+      return new Field<>(method);
+    }
 
     Field(final Method method) {
       this.method = method;
@@ -80,6 +90,29 @@ final class DocumentMeta<D extends Document> {
       } catch(final IllegalAccessException | InvocationTargetException e) {
         throw Exceptions.rethrow(e);
       }
+    }
+  }
+
+  static class OptionalField<T> extends Field<T> {
+
+    private final Type type;
+
+    OptionalField(final Method method) {
+      super(method);
+      this.type = ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
+    }
+
+    @Nonnull
+    @Override
+    Type type() {
+      return this.type;
+    }
+
+    @Nullable
+    @Override
+    T get(final Object object) {
+      final Optional<T> optional = (Optional<T>) super.get(object);
+      return optional.orElse(null);
     }
   }
 }
