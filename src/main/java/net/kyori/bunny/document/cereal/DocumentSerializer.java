@@ -23,13 +23,26 @@
  */
 package net.kyori.bunny.document.cereal;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.reflect.Reflection;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import net.kyori.bunny.document.Document;
 
-import java.io.IOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -38,7 +51,7 @@ import javax.inject.Singleton;
  * A serializer used for all {@link Document}s.
  */
 @Singleton
-public final class DocumentSerializer extends JsonSerializer<Document> {
+public final class DocumentSerializer implements JsonDeserializer<Document>, JsonSerializer<Document> {
 
   private final DocumentRegistry registry;
 
@@ -48,14 +61,42 @@ public final class DocumentSerializer extends JsonSerializer<Document> {
   }
 
   @Override
-  public void serialize(final Document document, final JsonGenerator generator, final SerializerProvider serializers) throws IOException {
-    generator.writeStartObject();
+  public Document deserialize(final JsonElement element, final Type typeT, final JsonDeserializationContext context) throws JsonParseException {
+    final JsonObject object = (JsonObject) element;
+    final Map<String, Object> fields = new HashMap<>();
+    final DocumentMeta<? extends Document> meta = this.registry.meta(TypeToken.of(typeT).getRawType().asSubclass(Document.class));
+    for(final Map.Entry<String, DocumentMeta.Field<?>> entry : meta.fields.entrySet()) {
+      final String name = entry.getKey();
+      final TypeToken<?> type = TypeToken.of(entry.getValue().type());
+      final Object value = context.deserialize(object.get(name), type.getType());
+      fields.put(name, entry.getValue() instanceof DocumentMeta.OptionalField ? Optional.ofNullable(value) : value);
+    }
+    return this.createDocument(meta, fields);
+  }
+
+  @Override
+  public JsonElement serialize(final Document document, final Type type, final JsonSerializationContext context) {
+    final JsonObject object = new JsonObject();
 
     final DocumentMeta<? extends Document> meta = this.registry.meta(document.getClass());
     for(final Map.Entry<String, DocumentMeta.Field<?>> entry : meta.fields.entrySet()) {
-      generator.writeObjectField(entry.getKey(), entry.getValue().get(document));
+      object.add(entry.getKey(), context.serialize(entry.getValue().get(document), entry.getValue().type()));
     }
 
-    generator.writeEndObject();
+    return object;
+  }
+
+  private <O extends Document> O createDocument(final DocumentMeta<O> meta, final Map<String, Object> fields) {
+    final LoadingCache<Method, MethodHandle> handles = Caffeine.newBuilder().build(method -> {
+      final String name = method.getName();
+      if(meta.fields.containsKey(name) && fields.containsKey(name)) {
+        return MethodHandles.constant(method.getReturnType(), fields.get(name));
+      }
+      if(method.getName().equals("toString") && method.getReturnType() == String.class) {
+        return MethodHandles.constant(method.getReturnType(), meta.type.getSimpleName() + fields.toString());
+      }
+      return MethodHandles.constant(method.getReturnType(), null);
+    });
+    return Reflection.newProxy(meta.type, (proxy, method, args) -> handles.get(method).invokeWithArguments(args));
   }
 }

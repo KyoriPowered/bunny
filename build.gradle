@@ -27,9 +27,9 @@ repositories {
 }
 
 dependencies {
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.9'
     compile 'com.github.ben-manes.caffeine:caffeine:2.5.2'
     compile 'com.rabbitmq:amqp-client:4.2.0'
+    compile 'net.kyori:gson:2.8.2-SNAPSHOT'
     compile 'net.kyori:membrane:1.0.0-SNAPSHOT'
     compile 'net.kyori:violet:1.0.0-SNAPSHOT'
     compile 'org.slf4j:slf4j-api:1.7.25'

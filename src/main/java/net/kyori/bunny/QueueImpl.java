@@ -23,11 +23,11 @@
  */
 package net.kyori.bunny;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.Envelope;
@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
@@ -57,7 +58,7 @@ abstract class QueueImpl implements Connectable, Queue {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Queue.class);
   @Inject private Bunny bunny;
-  @Inject private ObjectMapper mapper;
+  @Inject private Gson gson;
   @Inject private MessageRegistry mr;
   @Nonnull private final String name;
   private final boolean durable;
@@ -191,7 +192,7 @@ abstract class QueueImpl implements Connectable, Queue {
       try {
         this.delivery(properties, body);
       } catch(final Throwable t) {
-        LOGGER.error("Exception delivering message: {}", t, describe(properties));
+        LOGGER.error(String.format("Exception delivering message: %s", describe(properties)), t);
       }
     }
 
@@ -207,8 +208,12 @@ abstract class QueueImpl implements Connectable, Queue {
       }
 
       final String json = new String(body, StandardCharsets.UTF_8);
-      final Message message = QueueImpl.this.mapper.readerFor(type.getRawType()).readValue(json);
-      subscriptions.forEach(subscription -> subscription.consumer.accept(message, subscription, properties));
+      final Message message = QueueImpl.this.gson.fromJson(json, type.getType());
+      final Iterator<SubscriptionImpl<? extends Message>> it = subscriptions.iterator();
+      while(it.hasNext()) {
+        final SubscriptionImpl<? extends Message> subscription = it.next();
+        subscription.consumer.accept(message, it::remove, properties);
+      }
     }
   }
 

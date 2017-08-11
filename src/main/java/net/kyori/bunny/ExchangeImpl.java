@@ -23,8 +23,8 @@
  */
 package net.kyori.bunny;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.MoreObjects;
+import com.google.gson.Gson;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.BuiltinExchangeType;
 import net.kyori.bunny.message.Message;
@@ -50,7 +50,7 @@ abstract class ExchangeImpl implements Connectable, Exchange {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Exchange.class);
   @Inject private Bunny bunny;
-  @Inject private ObjectMapper mapper;
+  @Inject private Gson gson;
   @Inject private MessageRegistry mr;
   @Nonnull private final String name;
   @Nonnull private final String type;
@@ -141,7 +141,7 @@ abstract class ExchangeImpl implements Connectable, Exchange {
       .type(this.mr.id(message.getClass()))
       .build();
     try {
-      final String json = this.mapper.writerFor(message.getClass()).writeValueAsString(message);
+      final String json = this.gson.toJson(message);
       this.bunny.channel().basicPublish(this.name, routingKey, mandatory, immediate, properties, json.getBytes(StandardCharsets.UTF_8));
     } catch(final IOException e) {
       e.printStackTrace();
