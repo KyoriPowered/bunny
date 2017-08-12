@@ -24,8 +24,10 @@
 package net.kyori.bunny;
 
 import com.google.common.reflect.TypeToken;
+import net.kyori.bunny.message.Consume;
 import net.kyori.bunny.message.Message;
 import net.kyori.bunny.message.MessageConsumer;
+import net.kyori.bunny.message.TargetedMessageConsumer;
 import net.kyori.lunar.Nameable;
 
 import java.util.Map;
@@ -94,7 +96,7 @@ public interface Queue extends Nameable {
    * @return a representation of the subscription
    */
   @Nonnull
-  default <M extends Message> Subscription subscribe(@Nonnull final Class<M> type, @Nonnull final MessageConsumer<M> consumer) {
+  default <M extends Message> Subscription subscribe(@Nonnull final Class<M> type, @Nonnull final TargetedMessageConsumer<M> consumer) {
     return this.subscribe(TypeToken.of(type), consumer);
   }
 
@@ -107,7 +109,14 @@ public interface Queue extends Nameable {
    * @return a representation of the subscription
    */
   @Nonnull
-  <M extends Message> Subscription subscribe(@Nonnull final TypeToken<M> type, @Nonnull final MessageConsumer<M> consumer);
+  <M extends Message> Subscription subscribe(@Nonnull final TypeToken<M> type, @Nonnull final TargetedMessageConsumer<M> consumer);
+
+  /**
+   * Creates subscriptions for all {@link Consume consumers} found in {@code consumer}.
+   *
+   * @param consumer the consumer
+   */
+  void subscribe(@Nonnull final MessageConsumer consumer);
 
   /**
    * An abstract implementation of a queue.

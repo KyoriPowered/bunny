@@ -32,15 +32,20 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.ShutdownSignalException;
+import net.kyori.bunny.message.Consume;
 import net.kyori.bunny.message.Message;
 import net.kyori.bunny.message.MessageConsumer;
 import net.kyori.bunny.message.MessageRegistry;
+import net.kyori.bunny.message.TargetedMessageConsumer;
 import net.kyori.membrane.facet.Connectable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -150,10 +155,34 @@ abstract class QueueImpl implements Connectable, Queue {
 
   @Nonnull
   @Override
-  public <M extends Message> Subscription subscribe(@Nonnull final TypeToken<M> type, @Nonnull final MessageConsumer<M> consumer) {
+  public <M extends Message> Subscription subscribe(@Nonnull final TypeToken<M> type, @Nonnull final TargetedMessageConsumer<M> consumer) {
     final SubscriptionImpl<M> subscription = new SubscriptionImpl<>(consumer);
     this.consumers.put(type, subscription);
     return subscription;
+  }
+
+  @Override
+  public void subscribe(@Nonnull final MessageConsumer consumer) {
+    final TypeToken<?> consumerType = TypeToken.of(consumer.getClass());
+    Arrays.stream(consumer.getClass().getDeclaredMethods())
+      .filter(method -> method.isAnnotationPresent(Consume.class))
+      .filter(method -> method.getGenericParameterTypes().length == 3)
+      .filter(method -> {
+        final Type[] types = method.getGenericParameterTypes();
+        return TypeToken.of(types[0]).isSubtypeOf(Message.class)
+          && TypeToken.of(types[1]).isSupertypeOf(Subscription.class)
+          && TypeToken.of(types[2]).isSupertypeOf(AMQP.BasicProperties.class);
+      })
+      .forEach(method -> {
+        final TypeToken<? extends Message> messageType = (TypeToken<? extends Message>) consumerType.resolveType(method.getGenericParameterTypes()[0]);
+        QueueImpl.this.subscribe(messageType, (message, subscription, properties) -> {
+          try {
+            method.invoke(consumer, message, subscription, properties);
+          } catch(final IllegalAccessException | InvocationTargetException e) {
+            LOGGER.error("Exception delivering message to consumer", e);
+          }
+        });
+      });
   }
 
   @Override
@@ -226,9 +255,9 @@ abstract class QueueImpl implements Connectable, Queue {
   private class SubscriptionImpl<M extends Message> implements Subscription {
 
     // raw
-    final MessageConsumer consumer;
+    final TargetedMessageConsumer consumer;
 
-    private SubscriptionImpl(final MessageConsumer<M> consumer) {
+    private SubscriptionImpl(final TargetedMessageConsumer<M> consumer) {
       this.consumer = consumer;
     }
 

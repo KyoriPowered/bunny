@@ -23,9 +23,24 @@
  */
 package net.kyori.bunny.message;
 
-/**
- * A message consumer.
- */
-public interface MessageConsumer {
+import com.rabbitmq.client.AMQP;
+import net.kyori.bunny.Subscription;
 
+import javax.annotation.Nonnull;
+
+/**
+ * A targeted message consumer.
+ *
+ * @param <M> the message type
+ */
+public interface TargetedMessageConsumer<M extends Message> {
+
+  /**
+   * Consumes a message.
+   *
+   * @param message the message
+   * @param subscription the subscription
+   * @param properties the properties
+   */
+  void accept(@Nonnull final M message, @Nonnull final Subscription subscription, @Nonnull final AMQP.BasicProperties properties);
 }

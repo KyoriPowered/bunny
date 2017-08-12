@@ -25,12 +25,14 @@ package net.kyori.bunny;
 
 import com.google.common.reflect.TypeToken;
 import net.kyori.bunny.message.MessageConsumer;
+import net.kyori.bunny.message.TargetedMessageConsumer;
 
 /**
  * A subscription to a queue.
  *
- * @see Queue#subscribe(Class, MessageConsumer)
- * @see Queue#subscribe(TypeToken, MessageConsumer)
+ * @see Queue#subscribe(Class, TargetedMessageConsumer)
+ * @see Queue#subscribe(TypeToken, TargetedMessageConsumer)
+ * @see Queue#subscribe(MessageConsumer)
  */
 public interface Subscription {
 
