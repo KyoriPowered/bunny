@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import javax.annotation.Nonnull;
@@ -136,15 +137,27 @@ abstract class ExchangeImpl implements Connectable, Exchange {
   }
 
   @Override
-  public void publish(@Nonnull final Message message, final String routingKey, final boolean mandatory, final boolean immediate, AMQP.BasicProperties properties) {
-    properties = properties.builder()
-      .type(this.mr.id(message.getClass()))
-      .build();
+  public void publish(@Nonnull final Message message, @Nonnull final String routingKey, final boolean mandatory, final boolean immediate, @Nonnull final AMQP.BasicProperties properties) {
+    this.publish(message, routingKey, mandatory, immediate, properties.builder());
+  }
+
+  @Override
+  public void publishResponse(@Nonnull final Message message, @Nonnull final AMQP.BasicProperties request) {
+    final AMQP.BasicProperties.Builder properties = new AMQP.BasicProperties.Builder()
+      .correlationId(request.getMessageId());
+    this.publish(message, request.getReplyTo(), false, false, properties);
+  }
+
+  public void publish(@Nonnull final Message message, final String routingKey, final boolean mandatory, final boolean immediate, final AMQP.BasicProperties.Builder properties) {
+    properties
+      .messageId(UUID.randomUUID().toString())
+      .type(this.mr.id(message.getClass()));
+
     try {
       final String json = this.gson.toJson(message);
-      this.bunny.channel().basicPublish(this.name, routingKey, mandatory, immediate, properties, json.getBytes(StandardCharsets.UTF_8));
+      this.bunny.channel().basicPublish(this.name, routingKey, mandatory, immediate, properties.build(), json.getBytes(StandardCharsets.UTF_8));
     } catch(final IOException e) {
-      e.printStackTrace();
+      LOGGER.error("Exception encountered while publishing message", e);
     }
   }
 

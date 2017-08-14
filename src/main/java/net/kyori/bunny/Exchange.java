@@ -86,7 +86,7 @@ public interface Exchange extends Nameable {
    * @param routingKey the routing key
    * @param properties the properties
    */
-  default void publish(@Nonnull final Message message, final String routingKey, final AMQP.BasicProperties properties) {
+  default void publish(@Nonnull final Message message, @Nonnull final String routingKey, @Nonnull final AMQP.BasicProperties properties) {
     this.publish(message, routingKey, false, false, properties);
   }
 
@@ -99,7 +99,33 @@ public interface Exchange extends Nameable {
    * @param immediate if the {@code immediate} flag should be set
    * @param properties the properties
    */
-  void publish(@Nonnull final Message message, final String routingKey, final boolean mandatory, final boolean immediate, final AMQP.BasicProperties properties);
+  void publish(@Nonnull final Message message, @Nonnull final String routingKey, final boolean mandatory, final boolean immediate, @Nonnull final AMQP.BasicProperties properties);
+
+  /**
+   * Publish a response to a request.
+   *
+   * <p>This is a helper method that simply calls {@link #publish(Message, String, boolean, boolean, AMQP.BasicProperties)} with a
+   * mapping (see below) of request properties to response properties</p>
+   *
+   * <table summary="Request properties to Response properties mapping">
+   *   <tr>
+   *     <th>Request</th>
+   *     <th>Response</th>
+   *   </tr>
+   *   <tr>
+   *     <td>{@link AMQP.BasicProperties#getReplyTo()}</td>
+   *     <td>routing key</td>
+   *   </tr>
+   *   <tr>
+   *     <td>{@link AMQP.BasicProperties#getMessageId()}</td>
+   *     <td>{@link AMQP.BasicProperties#getCorrelationId()}</td>
+   *   </tr>
+   * </table>
+   *
+   * @param message the response message
+   * @param request the request properties
+   */
+  void publishResponse(@Nonnull final Message message, @Nonnull final AMQP.BasicProperties request);
 
   /**
    * An abstract implementation of an exchange.
