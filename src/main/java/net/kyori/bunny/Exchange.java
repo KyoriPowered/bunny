@@ -39,7 +39,6 @@ import javax.annotation.Nullable;
  * <p>Extend {@link Impl} instead of implementing this interface.</p>
  */
 public interface Exchange extends Nameable {
-
   /**
    * Gets the type of this exchange.
    *
@@ -131,7 +130,6 @@ public interface Exchange extends Nameable {
    * An abstract implementation of an exchange.
    */
   abstract class Impl extends ExchangeImpl {
-
     /**
      * Constructs a new exchange.
      *

@@ -41,7 +41,6 @@ import javax.annotation.Nullable;
  * <p>Extend {@link Impl} instead of implementing this interface.</p>
  */
 public interface Queue extends Nameable {
-
   /**
    * Tests if this queue is durable (survive a server restart).
    *
@@ -122,7 +121,6 @@ public interface Queue extends Nameable {
    * An abstract implementation of a queue.
    */
   abstract class Impl extends QueueImpl {
-
     /**
      * Constructs a new queue.
      *

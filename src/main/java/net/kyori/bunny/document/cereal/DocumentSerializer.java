@@ -52,7 +52,6 @@ import javax.inject.Singleton;
  */
 @Singleton
 public final class DocumentSerializer implements JsonDeserializer<Document>, JsonSerializer<Document> {
-
   private final DocumentRegistry registry;
 
   @Inject

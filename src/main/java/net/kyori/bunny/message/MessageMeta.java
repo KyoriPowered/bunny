@@ -32,7 +32,6 @@ import javax.annotation.Nullable;
  * @param <M> the message type
  */
 public final class MessageMeta<M extends Message> {
-
   /**
    * The message class.
    */

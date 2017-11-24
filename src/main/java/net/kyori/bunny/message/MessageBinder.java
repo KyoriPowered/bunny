@@ -33,7 +33,6 @@ import javax.annotation.Nonnull;
  * A message binder.
  */
 public final class MessageBinder {
-
   /**
    * The message set.
    */

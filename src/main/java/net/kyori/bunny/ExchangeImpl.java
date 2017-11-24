@@ -48,7 +48,6 @@ import javax.inject.Inject;
  * An abstract implementation of an exchange.
  */
 abstract class ExchangeImpl implements Connectable, Exchange {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(Exchange.class);
   @Inject private Bunny bunny;
   @Inject private Gson gson;

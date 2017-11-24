@@ -44,7 +44,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Singleton
 public class MessageRegistry {
-
   /**
    * A map of message ids to metadata.
    */

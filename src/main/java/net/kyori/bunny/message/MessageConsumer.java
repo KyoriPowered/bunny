@@ -27,5 +27,4 @@ package net.kyori.bunny.message;
  * A message consumer.
  */
 public interface MessageConsumer {
-
 }

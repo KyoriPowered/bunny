@@ -35,7 +35,6 @@ import java.lang.annotation.Target;
  * A message that may be published.
  */
 public interface Message extends Document {
-
   /**
    * An annotation to provide a name for a message.
    */
@@ -43,7 +42,6 @@ public interface Message extends Document {
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.TYPE)
   @interface Name {
-
     /**
      * Gets the name of the message.
      *

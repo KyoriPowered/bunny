@@ -35,7 +35,6 @@ import net.kyori.bunny.message.TargetedMessageConsumer;
  * @see Queue#subscribe(MessageConsumer)
  */
 public interface Subscription {
-
   /**
    * Cancels the subscription.
    */

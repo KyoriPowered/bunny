@@ -42,7 +42,6 @@ import javax.annotation.Nullable;
  * @param <D> the document type
  */
 final class DocumentMeta<D extends Document> {
-
   /**
    * The document class.
    */
@@ -62,7 +61,6 @@ final class DocumentMeta<D extends Document> {
    * during deserialization, and the value of calling the method during serialization.
    */
   static class Field<T> {
-
     private final Method method;
 
     public static <T> Field<T> create(final Method method) {
@@ -94,7 +92,6 @@ final class DocumentMeta<D extends Document> {
   }
 
   static class OptionalField<T> extends Field<T> {
-
     private final Type type;
 
     OptionalField(final Method method) {

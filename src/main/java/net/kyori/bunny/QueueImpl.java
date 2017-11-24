@@ -60,7 +60,6 @@ import javax.inject.Inject;
  * An abstract implementation of a queue.
  */
 abstract class QueueImpl implements Connectable, Queue {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(Queue.class);
   @Inject private Bunny bunny;
   @Inject private Gson gson;
@@ -193,7 +192,6 @@ abstract class QueueImpl implements Connectable, Queue {
   }
 
   private final class ConsumerImpl implements Consumer {
-
     @Override
     public void handleConsumeOk(final String consumerTag) {
     }
@@ -253,7 +251,6 @@ abstract class QueueImpl implements Connectable, Queue {
   }
 
   private class SubscriptionImpl<M extends Message> implements Subscription {
-
     // raw
     final TargetedMessageConsumer consumer;
 

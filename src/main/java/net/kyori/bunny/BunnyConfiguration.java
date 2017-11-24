@@ -33,7 +33,6 @@ import javax.annotation.Nonnull;
  * Represents the configuration for a {@link Bunny}.
  */
 public interface BunnyConfiguration {
-
   /**
    * Gets a list of the known broker addresses.
    *

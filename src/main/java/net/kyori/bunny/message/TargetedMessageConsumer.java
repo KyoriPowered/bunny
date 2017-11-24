@@ -34,7 +34,6 @@ import javax.annotation.Nonnull;
  * @param <M> the message type
  */
 public interface TargetedMessageConsumer<M extends Message> {
-
   /**
    * Consumes a message.
    *

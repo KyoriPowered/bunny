@@ -27,5 +27,4 @@ package net.kyori.bunny.document;
  * A document is something that can be serialized.
  */
 public interface Document {
-
 }

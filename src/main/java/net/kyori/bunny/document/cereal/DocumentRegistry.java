@@ -39,7 +39,6 @@ import javax.inject.Singleton;
  */
 @Singleton
 final class DocumentRegistry {
-
   private final LoadingCache<Class<? extends Document>, DocumentMeta<? extends Document>> meta = Caffeine.newBuilder().build(type -> {
     final Map<String, DocumentMeta.Field<?>> getters = new HashMap<>();
     for(final Method method : type.getMethods()) {
