@@ -24,10 +24,9 @@
 package net.kyori.bunny;
 
 import com.rabbitmq.client.Address;
+import net.kyori.blizzard.NonNull;
 
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 /**
  * Represents the configuration for a {@link Bunny}.
@@ -38,7 +37,7 @@ public interface BunnyConfiguration {
    *
    * @return a list of the known broker addresses
    */
-  @Nonnull
+  @NonNull
   List<Address> addresses();
 
   /**
@@ -46,7 +45,7 @@ public interface BunnyConfiguration {
    *
    * @return the username to use when connecting to the broker
    */
-  @Nonnull
+  @NonNull
   String username();
 
   /**
@@ -54,7 +53,7 @@ public interface BunnyConfiguration {
    *
    * @return the password to use when connecting to the broker
    */
-  @Nonnull
+  @NonNull
   String password();
 
   /**
@@ -62,7 +61,7 @@ public interface BunnyConfiguration {
    *
    * @return the virtual host to use when connecting to the broker
    */
-  @Nonnull
+  @NonNull
   String virtualHost();
 
   /**

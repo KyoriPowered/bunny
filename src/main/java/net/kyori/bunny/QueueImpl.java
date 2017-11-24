@@ -32,6 +32,8 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.ShutdownSignalException;
+import net.kyori.blizzard.NonNull;
+import net.kyori.blizzard.Nullable;
 import net.kyori.bunny.message.Consume;
 import net.kyori.bunny.message.Message;
 import net.kyori.bunny.message.MessageConsumer;
@@ -52,8 +54,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 /**
@@ -64,7 +64,7 @@ abstract class QueueImpl implements Connectable, Queue {
   @Inject private Bunny bunny;
   @Inject private Gson gson;
   @Inject private MessageRegistry mr;
-  @Nonnull private final String name;
+  @NonNull private final String name;
   private final boolean durable;
   private final boolean exclusive;
   private final boolean autoDelete;
@@ -81,7 +81,7 @@ abstract class QueueImpl implements Connectable, Queue {
    * @param autoDelete if this queue should auto-delete when no longer in use
    * @param arguments other construction arguments
    */
-  QueueImpl(@Nonnull final String name, final boolean durable, final boolean exclusive, final boolean autoDelete, @Nullable final Map<String, Object> arguments) {
+  QueueImpl(@NonNull final String name, final boolean durable, final boolean exclusive, final boolean autoDelete, @Nullable final Map<String, Object> arguments) {
     this.name = name;
     this.durable = durable;
     this.exclusive = exclusive;
@@ -89,7 +89,7 @@ abstract class QueueImpl implements Connectable, Queue {
     this.arguments = arguments;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public String name() {
     return this.name;
@@ -133,7 +133,7 @@ abstract class QueueImpl implements Connectable, Queue {
   }
 
   @Override
-  public void bind(@Nonnull final Exchange exchange, @Nonnull final String routingKey) {
+  public void bind(@NonNull final Exchange exchange, @NonNull final String routingKey) {
     try {
       LOGGER.info("Binding queue '{}' to exchange '{}' with routing key '{}'", this, exchange, routingKey);
       this.bunny.channel().queueBind(this.name, exchange.name(), routingKey, null);
@@ -143,7 +143,7 @@ abstract class QueueImpl implements Connectable, Queue {
   }
 
   @Override
-  public void unbind(@Nonnull final Exchange exchange, @Nonnull final String routingKey) {
+  public void unbind(@NonNull final Exchange exchange, @NonNull final String routingKey) {
     try {
       LOGGER.info("Unbinding queue '{}' from exchange '{}' with routing key '{}'", this, exchange, routingKey);
       this.bunny.channel().queueUnbind(this.name, exchange.name(), routingKey, null);
@@ -152,16 +152,16 @@ abstract class QueueImpl implements Connectable, Queue {
     }
   }
 
-  @Nonnull
+  @NonNull
   @Override
-  public <M extends Message> Subscription subscribe(@Nonnull final TypeToken<M> type, @Nonnull final TargetedMessageConsumer<M> consumer) {
+  public <M extends Message> Subscription subscribe(@NonNull final TypeToken<M> type, @NonNull final TargetedMessageConsumer<M> consumer) {
     final SubscriptionImpl<M> subscription = new SubscriptionImpl<>(consumer);
     this.consumers.put(type, subscription);
     return subscription;
   }
 
   @Override
-  public void subscribe(@Nonnull final MessageConsumer consumer) {
+  public void subscribe(@NonNull final MessageConsumer consumer) {
     final TypeToken<?> consumerType = TypeToken.of(consumer.getClass());
     Arrays.stream(consumer.getClass().getDeclaredMethods())
       .filter(method -> method.isAnnotationPresent(Consume.class))

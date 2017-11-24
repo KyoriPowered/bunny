@@ -24,6 +24,8 @@
 package net.kyori.bunny;
 
 import com.google.common.reflect.TypeToken;
+import net.kyori.blizzard.NonNull;
+import net.kyori.blizzard.Nullable;
 import net.kyori.bunny.message.Consume;
 import net.kyori.bunny.message.Message;
 import net.kyori.bunny.message.MessageConsumer;
@@ -31,9 +33,6 @@ import net.kyori.bunny.message.TargetedMessageConsumer;
 import net.kyori.lunar.Nameable;
 
 import java.util.Map;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Represents an AMQP queue.
@@ -76,7 +75,7 @@ public interface Queue extends Nameable {
    * @param exchange the exchange
    * @param routingKey the routing key
    */
-  void bind(@Nonnull final Exchange exchange, @Nonnull final String routingKey);
+  void bind(@NonNull final Exchange exchange, @NonNull final String routingKey);
 
   /**
    * Unbinds this queue from the exchange.
@@ -84,7 +83,7 @@ public interface Queue extends Nameable {
    * @param exchange the exchange
    * @param routingKey the routing key
    */
-  void unbind(@Nonnull final Exchange exchange, @Nonnull final String routingKey);
+  void unbind(@NonNull final Exchange exchange, @NonNull final String routingKey);
 
   /**
    * Creates a subscription.
@@ -94,8 +93,8 @@ public interface Queue extends Nameable {
    * @param <M> the message type
    * @return a representation of the subscription
    */
-  @Nonnull
-  default <M extends Message> Subscription subscribe(@Nonnull final Class<M> type, @Nonnull final TargetedMessageConsumer<M> consumer) {
+  @NonNull
+  default <M extends Message> Subscription subscribe(@NonNull final Class<M> type, @NonNull final TargetedMessageConsumer<M> consumer) {
     return this.subscribe(TypeToken.of(type), consumer);
   }
 
@@ -107,15 +106,15 @@ public interface Queue extends Nameable {
    * @param <M> the message type
    * @return a representation of the subscription
    */
-  @Nonnull
-  <M extends Message> Subscription subscribe(@Nonnull final TypeToken<M> type, @Nonnull final TargetedMessageConsumer<M> consumer);
+  @NonNull
+  <M extends Message> Subscription subscribe(@NonNull final TypeToken<M> type, @NonNull final TargetedMessageConsumer<M> consumer);
 
   /**
    * Creates subscriptions for all {@link Consume consumers} found in {@code consumer}.
    *
    * @param consumer the consumer
    */
-  void subscribe(@Nonnull final MessageConsumer consumer);
+  void subscribe(@NonNull final MessageConsumer consumer);
 
   /**
    * An abstract implementation of a queue.
@@ -129,7 +128,7 @@ public interface Queue extends Nameable {
      * @param exclusive if this queue is exclusive (restricted to this connection)
      * @param autoDelete if this queue should auto-delete when no longer in use
      */
-    protected Impl(@Nonnull final String name, final boolean durable, final boolean exclusive, final boolean autoDelete) {
+    protected Impl(@NonNull final String name, final boolean durable, final boolean exclusive, final boolean autoDelete) {
       super(name, durable, exclusive, autoDelete, null);
     }
 
@@ -142,7 +141,7 @@ public interface Queue extends Nameable {
      * @param autoDelete if this queue should auto-delete when no longer in use
      * @param arguments other construction arguments
      */
-    protected Impl(@Nonnull final String name, final boolean durable, final boolean exclusive, final boolean autoDelete, @Nullable final Map<String, Object> arguments) {
+    protected Impl(@NonNull final String name, final boolean durable, final boolean exclusive, final boolean autoDelete, @Nullable final Map<String, Object> arguments) {
       super(name, durable, exclusive, autoDelete, arguments);
     }
   }

@@ -25,13 +25,12 @@ package net.kyori.bunny;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.BuiltinExchangeType;
+import net.kyori.blizzard.NonNull;
+import net.kyori.blizzard.Nullable;
 import net.kyori.bunny.message.Message;
 import net.kyori.lunar.Nameable;
 
 import java.util.Map;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Represents an AMQP exchange.
@@ -46,7 +45,7 @@ public interface Exchange extends Nameable {
    *
    * @return the type
    */
-  @Nonnull
+  @NonNull
   String type();
 
   /**
@@ -85,7 +84,7 @@ public interface Exchange extends Nameable {
    * @param routingKey the routing key
    * @param properties the properties
    */
-  default void publish(@Nonnull final Message message, @Nonnull final String routingKey, @Nonnull final AMQP.BasicProperties properties) {
+  default void publish(@NonNull final Message message, @NonNull final String routingKey, @NonNull final AMQP.BasicProperties properties) {
     this.publish(message, routingKey, false, false, properties);
   }
 
@@ -98,7 +97,7 @@ public interface Exchange extends Nameable {
    * @param immediate if the {@code immediate} flag should be set
    * @param properties the properties
    */
-  void publish(@Nonnull final Message message, @Nonnull final String routingKey, final boolean mandatory, final boolean immediate, @Nonnull final AMQP.BasicProperties properties);
+  void publish(@NonNull final Message message, @NonNull final String routingKey, final boolean mandatory, final boolean immediate, @NonNull final AMQP.BasicProperties properties);
 
   /**
    * Publish a response to a request.
@@ -124,7 +123,7 @@ public interface Exchange extends Nameable {
    * @param message the response message
    * @param request the request properties
    */
-  void publishResponse(@Nonnull final Message message, @Nonnull final AMQP.BasicProperties request);
+  void publishResponse(@NonNull final Message message, @NonNull final AMQP.BasicProperties request);
 
   /**
    * An abstract implementation of an exchange.
@@ -139,7 +138,7 @@ public interface Exchange extends Nameable {
      * @param autoDelete if this exchange should auto-delete when no longer in use
      * @param internal if this exchange is internal (can't be directly published to by a client)
      */
-    protected Impl(@Nonnull final String name, @Nonnull final BuiltinExchangeType type, final boolean durable, final boolean autoDelete, final boolean internal) {
+    protected Impl(@NonNull final String name, @NonNull final BuiltinExchangeType type, final boolean durable, final boolean autoDelete, final boolean internal) {
       super(name, type, durable, autoDelete, internal, null);
     }
 
@@ -153,7 +152,7 @@ public interface Exchange extends Nameable {
      * @param internal if this exchange is internal (can't be directly published to by a client)
      * @param arguments other construction arguments
      */
-    protected Impl(@Nonnull final String name, @Nonnull final BuiltinExchangeType type, final boolean durable, final boolean autoDelete, final boolean internal, @Nullable final Map<String, Object> arguments) {
+    protected Impl(@NonNull final String name, @NonNull final BuiltinExchangeType type, final boolean durable, final boolean autoDelete, final boolean internal, @Nullable final Map<String, Object> arguments) {
       super(name, type, durable, autoDelete, internal, arguments);
     }
 
@@ -166,7 +165,7 @@ public interface Exchange extends Nameable {
      * @param autoDelete if this exchange should auto-delete when no longer in use
      * @param internal if this exchange is internal (can't be directly published to by a client)
      */
-    protected Impl(@Nonnull final String name, @Nonnull final String type, final boolean durable, final boolean autoDelete, final boolean internal) {
+    protected Impl(@NonNull final String name, @NonNull final String type, final boolean durable, final boolean autoDelete, final boolean internal) {
       super(name, type, durable, autoDelete, internal, null);
     }
 
@@ -180,7 +179,7 @@ public interface Exchange extends Nameable {
      * @param internal if this exchange is internal (can't be directly published to by a client)
      * @param arguments other construction arguments
      */
-    protected Impl(@Nonnull final String name, @Nonnull final String type, final boolean durable, final boolean autoDelete, final boolean internal, @Nullable final Map<String, Object> arguments) {
+    protected Impl(@NonNull final String name, @NonNull final String type, final boolean durable, final boolean autoDelete, final boolean internal, @Nullable final Map<String, Object> arguments) {
       super(name, type, durable, autoDelete, internal, arguments);
     }
   }

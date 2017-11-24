@@ -26,14 +26,14 @@ package net.kyori.bunny.message;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.reflect.TypeToken;
+import net.kyori.blizzard.NonNull;
+import net.kyori.blizzard.Nullable;
 import net.kyori.lunar.reflect.Hierarchy;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -68,7 +68,7 @@ public class MessageRegistry {
    * @return the type token, or {@code null}
    */
   @Nullable
-  public TypeToken<? extends Message> type(@Nonnull final String name) {
+  public TypeToken<? extends Message> type(@NonNull final String name) {
     @Nullable final MessageMeta<?> meta = this.id.get(name);
     if(meta != null) {
       return TypeToken.of(meta.type());
@@ -82,12 +82,12 @@ public class MessageRegistry {
    * @param klass the message class
    * @return the message id
    */
-  @Nonnull
-  public String id(@Nonnull final Class<? extends Message> klass) {
+  @NonNull
+  public String id(@NonNull final Class<? extends Message> klass) {
     return checkNotNull(this.type.get(klass), "metadata for '%s'", klass.getName()).name();
   }
 
-  private <M extends Message> MessageMeta<M> find(@Nonnull final Class<? extends Message> klass) {
+  private <M extends Message> MessageMeta<M> find(@NonNull final Class<? extends Message> klass) {
     final Map<Class<? extends Message>, MessageMeta<?>> byType = this.type.asMap();
     final Class<? extends Message> match = Hierarchy.find(klass, Message.class, byType::containsKey);
     return (MessageMeta<M>) byType.get(match);

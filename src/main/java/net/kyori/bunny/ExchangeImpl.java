@@ -27,6 +27,8 @@ import com.google.common.base.MoreObjects;
 import com.google.gson.Gson;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.BuiltinExchangeType;
+import net.kyori.blizzard.NonNull;
+import net.kyori.blizzard.Nullable;
 import net.kyori.bunny.message.Message;
 import net.kyori.bunny.message.MessageRegistry;
 import net.kyori.membrane.facet.Connectable;
@@ -40,8 +42,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 /**
@@ -52,8 +52,8 @@ abstract class ExchangeImpl implements Connectable, Exchange {
   @Inject private Bunny bunny;
   @Inject private Gson gson;
   @Inject private MessageRegistry mr;
-  @Nonnull private final String name;
-  @Nonnull private final String type;
+  @NonNull private final String name;
+  @NonNull private final String type;
   private final boolean durable;
   private final boolean autoDelete;
   private final boolean internal;
@@ -69,7 +69,7 @@ abstract class ExchangeImpl implements Connectable, Exchange {
    * @param internal if this exchange is internal (can't be directly published to by a client)
    * @param arguments other construction arguments
    */
-  ExchangeImpl(@Nonnull final String name, @Nonnull final BuiltinExchangeType type, final boolean durable, final boolean autoDelete, final boolean internal, @Nullable final Map<String, Object> arguments) {
+  ExchangeImpl(@NonNull final String name, @NonNull final BuiltinExchangeType type, final boolean durable, final boolean autoDelete, final boolean internal, @Nullable final Map<String, Object> arguments) {
     this(name, type.getType(), durable, autoDelete, internal, arguments);
   }
 
@@ -83,7 +83,7 @@ abstract class ExchangeImpl implements Connectable, Exchange {
    * @param internal if this exchange is internal (can't be directly published to by a client)
    * @param arguments other construction arguments
    */
-  ExchangeImpl(@Nonnull final String name, @Nonnull final String type, final boolean durable, final boolean autoDelete, final boolean internal, @Nullable final Map<String, Object> arguments) {
+  ExchangeImpl(@NonNull final String name, @NonNull final String type, final boolean durable, final boolean autoDelete, final boolean internal, @Nullable final Map<String, Object> arguments) {
     this.name = name;
     this.type = type;
     this.durable = durable;
@@ -92,13 +92,13 @@ abstract class ExchangeImpl implements Connectable, Exchange {
     this.arguments = arguments;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public String name() {
     return this.name;
   }
 
-  @Nonnull
+  @NonNull
   @Override
   public String type() {
     return this.type;
@@ -136,18 +136,18 @@ abstract class ExchangeImpl implements Connectable, Exchange {
   }
 
   @Override
-  public void publish(@Nonnull final Message message, @Nonnull final String routingKey, final boolean mandatory, final boolean immediate, @Nonnull final AMQP.BasicProperties properties) {
+  public void publish(@NonNull final Message message, @NonNull final String routingKey, final boolean mandatory, final boolean immediate, @NonNull final AMQP.BasicProperties properties) {
     this.publish(message, routingKey, mandatory, immediate, properties.builder());
   }
 
   @Override
-  public void publishResponse(@Nonnull final Message message, @Nonnull final AMQP.BasicProperties request) {
+  public void publishResponse(@NonNull final Message message, @NonNull final AMQP.BasicProperties request) {
     final AMQP.BasicProperties.Builder properties = new AMQP.BasicProperties.Builder()
       .correlationId(request.getMessageId());
     this.publish(message, request.getReplyTo(), false, false, properties);
   }
 
-  public void publish(@Nonnull final Message message, final String routingKey, final boolean mandatory, final boolean immediate, final AMQP.BasicProperties.Builder properties) {
+  public void publish(@NonNull final Message message, final String routingKey, final boolean mandatory, final boolean immediate, final AMQP.BasicProperties.Builder properties) {
     properties
       .messageId(UUID.randomUUID().toString())
       .type(this.mr.id(message.getClass()));

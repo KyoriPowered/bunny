@@ -26,8 +26,7 @@ package net.kyori.bunny.message;
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
-
-import javax.annotation.Nonnull;
+import net.kyori.blizzard.NonNull;
 
 /**
  * A message binder.
@@ -44,12 +43,12 @@ public final class MessageBinder {
    * @param binder the binder
    * @return a new message binder
    */
-  @Nonnull
-  public static MessageBinder create(@Nonnull final Binder binder) {
+  @NonNull
+  public static MessageBinder create(@NonNull final Binder binder) {
     return new MessageBinder(binder);
   }
 
-  protected MessageBinder(@Nonnull final Binder binder) {
+  protected MessageBinder(@NonNull final Binder binder) {
     this.messages = Multibinder.newSetBinder(binder, new TypeLiteral<MessageMeta<? extends Message>>() {});
   }
 
@@ -60,8 +59,8 @@ public final class MessageBinder {
    * @param <M> the message type
    * @return this message binder
    */
-  @Nonnull
-  public <M extends Message> MessageBinder register(@Nonnull final Class<M> message) {
+  @NonNull
+  public <M extends Message> MessageBinder register(@NonNull final Class<M> message) {
     this.messages.addBinding().toInstance(new MessageMeta<>(message));
     return this;
   }

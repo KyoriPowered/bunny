@@ -23,8 +23,8 @@
  */
 package net.kyori.bunny.message;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import net.kyori.blizzard.NonNull;
+import net.kyori.blizzard.Nullable;
 
 /**
  * Metadata describing a message.
@@ -35,15 +35,15 @@ public final class MessageMeta<M extends Message> {
   /**
    * The message class.
    */
-  @Nonnull private final Class<M> type;
+  @NonNull private final Class<M> type;
   /**
    * The message name.
    *
    * <p>This is either the value of {@link Message.Name}, or the {@link Class#getSimpleName() simple name}.</p>
    */
-  @Nonnull private final String name;
+  @NonNull private final String name;
 
-  MessageMeta(@Nonnull final Class<M> type) {
+  MessageMeta(@NonNull final Class<M> type) {
     this.type = type;
 
     @Nullable final Message.Name name = type.getAnnotation(Message.Name.class);
@@ -55,7 +55,7 @@ public final class MessageMeta<M extends Message> {
    *
    * @return the message class
    */
-  @Nonnull
+  @NonNull
   public Class<M> type() {
     return this.type;
   }
@@ -65,7 +65,7 @@ public final class MessageMeta<M extends Message> {
    *
    * @return the message name
    */
-  @Nonnull
+  @NonNull
   public String name() {
     return this.name;
   }

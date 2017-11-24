@@ -26,6 +26,8 @@ package net.kyori.bunny;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import net.kyori.blizzard.NonNull;
+import net.kyori.blizzard.Nullable;
 import net.kyori.membrane.facet.Connectable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +35,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -64,7 +64,7 @@ public class Bunny implements Connectable {
    *
    * @return the channel
    */
-  @Nonnull
+  @NonNull
   public Channel channel() {
     checkState(this.channel != null, "bunny has not been connected");
     return this.channel;

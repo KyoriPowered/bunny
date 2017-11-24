@@ -24,9 +24,8 @@
 package net.kyori.bunny.message;
 
 import com.rabbitmq.client.AMQP;
+import net.kyori.blizzard.NonNull;
 import net.kyori.bunny.Subscription;
-
-import javax.annotation.Nonnull;
 
 /**
  * A targeted message consumer.
@@ -41,5 +40,5 @@ public interface TargetedMessageConsumer<M extends Message> {
    * @param subscription the subscription
    * @param properties the properties
    */
-  void accept(@Nonnull final M message, @Nonnull final Subscription subscription, @Nonnull final AMQP.BasicProperties properties);
+  void accept(@NonNull final M message, @NonNull final Subscription subscription, @NonNull final AMQP.BasicProperties properties);
 }
