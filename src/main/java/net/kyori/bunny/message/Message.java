@@ -23,6 +23,8 @@
  */
 package net.kyori.bunny.message;
 
+import net.kyori.cereal.Document;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -32,7 +34,7 @@ import java.lang.annotation.Target;
 /**
  * A message that may be published.
  */
-public interface Message {
+public interface Message extends Document {
   /**
    * An annotation to provide a name for a message.
    */
