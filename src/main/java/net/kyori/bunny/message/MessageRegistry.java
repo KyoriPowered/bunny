@@ -1,7 +1,7 @@
 /*
  * This file is part of bunny, licensed under the MIT License.
  *
- * Copyright (c) 2017 KyoriPowered
+ * Copyright (c) 2017-2018 KyoriPowered
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,9 +26,9 @@ package net.kyori.bunny.message;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.reflect.TypeToken;
-import net.kyori.blizzard.NonNull;
-import net.kyori.blizzard.Nullable;
 import net.kyori.lunar.reflect.Hierarchy;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,9 +67,8 @@ public class MessageRegistry {
    * @param name the message id
    * @return the type token, or {@code null}
    */
-  @Nullable
-  public TypeToken<? extends Message> type(@NonNull final String name) {
-    @Nullable final MessageMeta<?> meta = this.id.get(name);
+  public @Nullable TypeToken<? extends Message> type(final @NonNull String name) {
+    final @Nullable MessageMeta<?> meta = this.id.get(name);
     if(meta != null) {
       return TypeToken.of(meta.type());
     }
@@ -82,12 +81,11 @@ public class MessageRegistry {
    * @param klass the message class
    * @return the message id
    */
-  @NonNull
-  public String id(@NonNull final Class<? extends Message> klass) {
+  public @NonNull String id(final @NonNull Class<? extends Message> klass) {
     return checkNotNull(this.type.get(klass), "metadata for '%s'", klass.getName()).name();
   }
 
-  private <M extends Message> MessageMeta<M> find(@NonNull final Class<? extends Message> klass) {
+  private <M extends Message> MessageMeta<M> find(final @NonNull Class<? extends Message> klass) {
     final Map<Class<? extends Message>, MessageMeta<?>> byType = this.type.asMap();
     final Class<? extends Message> match = Hierarchy.find(klass, Message.class, byType::containsKey);
     return (MessageMeta<M>) byType.get(match);

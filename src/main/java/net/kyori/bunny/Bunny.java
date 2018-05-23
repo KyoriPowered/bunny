@@ -1,7 +1,7 @@
 /*
  * This file is part of bunny, licensed under the MIT License.
  *
- * Copyright (c) 2017 KyoriPowered
+ * Copyright (c) 2017-2018 KyoriPowered
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,9 +26,9 @@ package net.kyori.bunny;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import net.kyori.blizzard.NonNull;
-import net.kyori.blizzard.Nullable;
 import net.kyori.membrane.facet.Connectable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public class Bunny implements Connectable {
   private static final Logger LOGGER = LoggerFactory.getLogger(Bunny.class);
   private final BunnyConfiguration config;
   private Connection connection;
-  @Nullable private Channel channel;
+  private @Nullable Channel channel;
 
   @Inject
   private Bunny(final BunnyConfiguration config) {
@@ -64,8 +64,7 @@ public class Bunny implements Connectable {
    *
    * @return the channel
    */
-  @NonNull
-  public Channel channel() {
+  public @NonNull Channel channel() {
     checkState(this.channel != null, "bunny has not been connected");
     return this.channel;
   }

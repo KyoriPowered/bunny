@@ -1,7 +1,7 @@
 /*
  * This file is part of bunny, licensed under the MIT License.
  *
- * Copyright (c) 2017 KyoriPowered
+ * Copyright (c) 2017-2018 KyoriPowered
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 package net.kyori.bunny;
 
 import com.rabbitmq.client.Address;
-import net.kyori.blizzard.NonNull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
@@ -37,32 +37,28 @@ public interface BunnyConfiguration {
    *
    * @return a list of the known broker addresses
    */
-  @NonNull
-  List<Address> addresses();
+  @NonNull List<Address> addresses();
 
   /**
    * Gets the username to use when connecting to the broker.
    *
    * @return the username to use when connecting to the broker
    */
-  @NonNull
-  String username();
+  @NonNull String username();
 
   /**
    * Gets the password to use when connecting to the broker.
    *
    * @return the password to use when connecting to the broker
    */
-  @NonNull
-  String password();
+  @NonNull String password();
 
   /**
    * Gets the virtual host to use when connecting to the broker.
    *
    * @return the virtual host to use when connecting to the broker
    */
-  @NonNull
-  String virtualHost();
+  @NonNull String virtualHost();
 
   /**
    * Tests if automatic connection recovery should be used.

@@ -1,7 +1,7 @@
 /*
  * This file is part of bunny, licensed under the MIT License.
  *
- * Copyright (c) 2017 KyoriPowered
+ * Copyright (c) 2017-2018 KyoriPowered
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,14 +32,14 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.ShutdownSignalException;
-import net.kyori.blizzard.NonNull;
-import net.kyori.blizzard.Nullable;
 import net.kyori.bunny.message.Consume;
 import net.kyori.bunny.message.Message;
 import net.kyori.bunny.message.MessageConsumer;
 import net.kyori.bunny.message.MessageRegistry;
 import net.kyori.bunny.message.TargetedMessageConsumer;
 import net.kyori.membrane.facet.Connectable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +52,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
@@ -61,15 +60,15 @@ import javax.inject.Inject;
  */
 abstract class QueueImpl implements Connectable, Queue {
   private static final Logger LOGGER = LoggerFactory.getLogger(Queue.class);
-  @Inject private Bunny bunny;
-  @Inject private Gson gson;
-  @Inject private MessageRegistry mr;
-  @NonNull private final String name;
+  private @Inject Bunny bunny;
+  private @Inject Gson gson;
+  private @Inject MessageRegistry mr;
+  private final @NonNull String name;
   private final boolean durable;
   private final boolean exclusive;
   private final boolean autoDelete;
-  @Nullable private final Map<String, Object> arguments;
-  @Nullable private String consumerTag;
+  private final @Nullable Map<String, Object> arguments;
+  private @Nullable String consumerTag;
   private final Multimap<TypeToken<? extends Message>, SubscriptionImpl<? extends Message>> consumers = HashMultimap.create();
 
   /**
@@ -81,7 +80,7 @@ abstract class QueueImpl implements Connectable, Queue {
    * @param autoDelete if this queue should auto-delete when no longer in use
    * @param arguments other construction arguments
    */
-  QueueImpl(@NonNull final String name, final boolean durable, final boolean exclusive, final boolean autoDelete, @Nullable final Map<String, Object> arguments) {
+  QueueImpl(final @NonNull String name, final boolean durable, final boolean exclusive, final boolean autoDelete, final @Nullable Map<String, Object> arguments) {
     this.name = name;
     this.durable = durable;
     this.exclusive = exclusive;
@@ -89,9 +88,8 @@ abstract class QueueImpl implements Connectable, Queue {
     this.arguments = arguments;
   }
 
-  @NonNull
   @Override
-  public String name() {
+  public @NonNull String name() {
     return this.name;
   }
 
@@ -110,14 +108,13 @@ abstract class QueueImpl implements Connectable, Queue {
     return this.autoDelete;
   }
 
-  @Nullable
   @Override
-  public Map<String, Object> arguments() {
+  public @Nullable Map<String, Object> arguments() {
     return this.arguments != null ? Collections.unmodifiableMap(this.arguments) : null;
   }
 
   @Override
-  public void connect() throws IOException, TimeoutException {
+  public void connect() throws IOException {
     LOGGER.info("Declaring queue '{}'", this);
     this.bunny.channel().queueDeclare(this.name, this.durable, this.exclusive, this.autoDelete, this.arguments);
     this.consumerTag = this.bunny.channel().basicConsume(this.name, false, "", false, true, null, new ConsumerImpl());
@@ -125,7 +122,7 @@ abstract class QueueImpl implements Connectable, Queue {
   }
 
   @Override
-  public void disconnect() throws IOException, TimeoutException {
+  public void disconnect() throws IOException {
     if(this.consumerTag != null && this.bunny.active()) {
       LOGGER.info("Cancelling consume on '{}' with tag '{}'", this, this.consumerTag);
       this.bunny.channel().basicCancel(this.consumerTag);
@@ -133,7 +130,7 @@ abstract class QueueImpl implements Connectable, Queue {
   }
 
   @Override
-  public void bind(@NonNull final Exchange exchange, @NonNull final String routingKey) {
+  public void bind(final @NonNull Exchange exchange, final @NonNull String routingKey) {
     try {
       LOGGER.info("Binding queue '{}' to exchange '{}' with routing key '{}'", this, exchange, routingKey);
       this.bunny.channel().queueBind(this.name, exchange.name(), routingKey, null);
@@ -143,7 +140,7 @@ abstract class QueueImpl implements Connectable, Queue {
   }
 
   @Override
-  public void unbind(@NonNull final Exchange exchange, @NonNull final String routingKey) {
+  public void unbind(final @NonNull Exchange exchange, final @NonNull String routingKey) {
     try {
       LOGGER.info("Unbinding queue '{}' from exchange '{}' with routing key '{}'", this, exchange, routingKey);
       this.bunny.channel().queueUnbind(this.name, exchange.name(), routingKey, null);
@@ -152,16 +149,15 @@ abstract class QueueImpl implements Connectable, Queue {
     }
   }
 
-  @NonNull
   @Override
-  public <M extends Message> Subscription subscribe(@NonNull final TypeToken<M> type, @NonNull final TargetedMessageConsumer<M> consumer) {
+  public <M extends Message> @NonNull Subscription subscribe(final @NonNull TypeToken<M> type, final @NonNull TargetedMessageConsumer<M> consumer) {
     final SubscriptionImpl<M> subscription = new SubscriptionImpl<>(consumer);
     this.consumers.put(type, subscription);
     return subscription;
   }
 
   @Override
-  public void subscribe(@NonNull final MessageConsumer consumer) {
+  public void subscribe(final @NonNull MessageConsumer consumer) {
     final TypeToken<?> consumerType = TypeToken.of(consumer.getClass());
     Arrays.stream(consumer.getClass().getDeclaredMethods())
       .filter(method -> method.isAnnotationPresent(Consume.class))
@@ -201,7 +197,7 @@ abstract class QueueImpl implements Connectable, Queue {
     }
 
     @Override
-    public void handleCancel(final String consumerTag) throws IOException {
+    public void handleCancel(final String consumerTag) {
     }
 
     @Override
@@ -223,7 +219,7 @@ abstract class QueueImpl implements Connectable, Queue {
       }
     }
 
-    private void delivery(final AMQP.BasicProperties properties, final byte[] body) throws IOException {
+    private void delivery(final AMQP.BasicProperties properties, final byte[] body) {
       final TypeToken<? extends Message> type = QueueImpl.this.mr.type(properties.getType());
       if(type == null) {
         return;

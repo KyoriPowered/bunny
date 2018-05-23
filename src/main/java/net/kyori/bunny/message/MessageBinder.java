@@ -1,7 +1,7 @@
 /*
  * This file is part of bunny, licensed under the MIT License.
  *
- * Copyright (c) 2017 KyoriPowered
+ * Copyright (c) 2017-2018 KyoriPowered
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,43 +25,14 @@ package net.kyori.bunny.message;
 
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
-import com.google.inject.multibindings.Multibinder;
-import net.kyori.blizzard.NonNull;
+import net.kyori.violet.SetBinder;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A message binder.
  */
-public final class MessageBinder {
-  /**
-   * The message set.
-   */
-  private final Multibinder<MessageMeta<? extends Message>> messages;
-
-  /**
-   * Creates a new message binder.
-   *
-   * @param binder the binder
-   * @return a new message binder
-   */
-  @NonNull
-  public static MessageBinder create(@NonNull final Binder binder) {
-    return new MessageBinder(binder);
-  }
-
-  protected MessageBinder(@NonNull final Binder binder) {
-    this.messages = Multibinder.newSetBinder(binder, new TypeLiteral<MessageMeta<? extends Message>>() {});
-  }
-
-  /**
-   * Adds a message to the set.
-   *
-   * @param message the message
-   * @param <M> the message type
-   * @return this message binder
-   */
-  @NonNull
-  public <M extends Message> MessageBinder register(@NonNull final Class<M> message) {
-    this.messages.addBinding().toInstance(new MessageMeta<>(message));
-    return this;
+public final class MessageBinder extends SetBinder<MessageMeta<? extends Message>> {
+  public MessageBinder(final @NonNull Binder binder) {
+    super(binder, new TypeLiteral<MessageMeta<? extends Message>>() {});
   }
 }

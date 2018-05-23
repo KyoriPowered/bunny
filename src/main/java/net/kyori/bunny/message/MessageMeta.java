@@ -1,7 +1,7 @@
 /*
  * This file is part of bunny, licensed under the MIT License.
  *
- * Copyright (c) 2017 KyoriPowered
+ * Copyright (c) 2017-2018 KyoriPowered
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,8 @@
  */
 package net.kyori.bunny.message;
 
-import net.kyori.blizzard.NonNull;
-import net.kyori.blizzard.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Metadata describing a message.
@@ -35,7 +35,7 @@ public final class MessageMeta<M extends Message> {
   /**
    * The message class.
    */
-  @NonNull private final Class<M> type;
+  private final @NonNull Class<M> type;
   /**
    * The message name.
    *
@@ -43,10 +43,10 @@ public final class MessageMeta<M extends Message> {
    */
   @NonNull private final String name;
 
-  MessageMeta(@NonNull final Class<M> type) {
+  MessageMeta(final @NonNull Class<M> type) {
     this.type = type;
 
-    @Nullable final Message.Name name = type.getAnnotation(Message.Name.class);
+    final Message.@Nullable Name name = type.getAnnotation(Message.Name.class);
     this.name = name != null ? name.value() : type.getSimpleName();
   }
 
@@ -55,8 +55,7 @@ public final class MessageMeta<M extends Message> {
    *
    * @return the message class
    */
-  @NonNull
-  public Class<M> type() {
+  public @NonNull Class<M> type() {
     return this.type;
   }
 
@@ -65,8 +64,7 @@ public final class MessageMeta<M extends Message> {
    *
    * @return the message name
    */
-  @NonNull
-  public String name() {
+  public @NonNull String name() {
     return this.name;
   }
 }

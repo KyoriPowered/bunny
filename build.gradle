@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'net.kyori'
-version '1.1.0-SNAPSHOT'
+version '2.0.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -27,15 +27,16 @@ repositories {
 }
 
 dependencies {
-  compile 'com.github.ben-manes.caffeine:caffeine:2.6.0'
-  compile 'com.rabbitmq:amqp-client:5.0.0'
-  compile 'net.kyori:blizzard:1.0.4-JDK8144185'
-  compile 'net.kyori:cereal:1.0.2'
-  compile 'net.kyori:gson:2.8.3-SNAPSHOT'
+  compile 'com.github.ben-manes.caffeine:caffeine:2.6.2'
+  compile 'com.rabbitmq:amqp-client:5.2.0'
+  compile 'net.kyori:cereal:1.0.5-SNAPSHOT'
+  compile 'net.kyori:gson:2.8.5-SNAPSHOT'
   compile 'net.kyori:membrane:1.0.5'
-  compile 'net.kyori:violet:1.0.0'
+  compile 'net.kyori:violet:2.0.0-SNAPSHOT'
+  compile 'org.checkerframework:checker-qual:2.4.0'
   compile 'org.slf4j:slf4j-api:1.7.25'
-  testCompile 'junit:junit:4.12'
+  testCompile 'org.junit.jupiter:junit-jupiter-api:5.2.0'
+  testCompile 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
 }
 
 task javadocJar(type: Jar) {

@@ -1,7 +1,7 @@
 /*
  * This file is part of bunny, licensed under the MIT License.
  *
- * Copyright (c) 2017 KyoriPowered
+ * Copyright (c) 2017-2018 KyoriPowered
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,13 +24,13 @@
 package net.kyori.bunny;
 
 import com.google.common.reflect.TypeToken;
-import net.kyori.blizzard.NonNull;
-import net.kyori.blizzard.Nullable;
 import net.kyori.bunny.message.Consume;
 import net.kyori.bunny.message.Message;
 import net.kyori.bunny.message.MessageConsumer;
 import net.kyori.bunny.message.TargetedMessageConsumer;
-import net.kyori.lunar.Nameable;
+import net.kyori.lunar.Named;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Map;
 
@@ -39,7 +39,7 @@ import java.util.Map;
  *
  * <p>Extend {@link Impl} instead of implementing this interface.</p>
  */
-public interface Queue extends Nameable {
+public interface Queue extends Named {
   /**
    * Tests if this queue is durable (survive a server restart).
    *
@@ -66,8 +66,7 @@ public interface Queue extends Nameable {
    *
    * @return an unmodifiable map of additional construction arguments, or {@code null}
    */
-  @Nullable
-  Map<String, Object> arguments();
+  @Nullable Map<String, Object> arguments();
 
   /**
    * Binds this queue to the exchange.
@@ -75,7 +74,7 @@ public interface Queue extends Nameable {
    * @param exchange the exchange
    * @param routingKey the routing key
    */
-  void bind(@NonNull final Exchange exchange, @NonNull final String routingKey);
+  void bind(final @NonNull Exchange exchange, final @NonNull String routingKey);
 
   /**
    * Unbinds this queue from the exchange.
@@ -83,7 +82,7 @@ public interface Queue extends Nameable {
    * @param exchange the exchange
    * @param routingKey the routing key
    */
-  void unbind(@NonNull final Exchange exchange, @NonNull final String routingKey);
+  void unbind(final @NonNull Exchange exchange, final @NonNull String routingKey);
 
   /**
    * Creates a subscription.
@@ -93,8 +92,7 @@ public interface Queue extends Nameable {
    * @param <M> the message type
    * @return a representation of the subscription
    */
-  @NonNull
-  default <M extends Message> Subscription subscribe(@NonNull final Class<M> type, @NonNull final TargetedMessageConsumer<M> consumer) {
+  default <M extends Message> @NonNull Subscription subscribe(final @NonNull Class<M> type, final @NonNull TargetedMessageConsumer<M> consumer) {
     return this.subscribe(TypeToken.of(type), consumer);
   }
 
@@ -106,15 +104,14 @@ public interface Queue extends Nameable {
    * @param <M> the message type
    * @return a representation of the subscription
    */
-  @NonNull
-  <M extends Message> Subscription subscribe(@NonNull final TypeToken<M> type, @NonNull final TargetedMessageConsumer<M> consumer);
+  <M extends Message> @NonNull Subscription subscribe(final @NonNull TypeToken<M> type, final @NonNull TargetedMessageConsumer<M> consumer);
 
   /**
    * Creates subscriptions for all {@link Consume consumers} found in {@code consumer}.
    *
    * @param consumer the consumer
    */
-  void subscribe(@NonNull final MessageConsumer consumer);
+  void subscribe(final @NonNull MessageConsumer consumer);
 
   /**
    * An abstract implementation of a queue.
@@ -128,7 +125,7 @@ public interface Queue extends Nameable {
      * @param exclusive if this queue is exclusive (restricted to this connection)
      * @param autoDelete if this queue should auto-delete when no longer in use
      */
-    protected Impl(@NonNull final String name, final boolean durable, final boolean exclusive, final boolean autoDelete) {
+    protected Impl(final @NonNull String name, final boolean durable, final boolean exclusive, final boolean autoDelete) {
       super(name, durable, exclusive, autoDelete, null);
     }
 
@@ -141,7 +138,7 @@ public interface Queue extends Nameable {
      * @param autoDelete if this queue should auto-delete when no longer in use
      * @param arguments other construction arguments
      */
-    protected Impl(@NonNull final String name, final boolean durable, final boolean exclusive, final boolean autoDelete, @Nullable final Map<String, Object> arguments) {
+    protected Impl(final @NonNull String name, final boolean durable, final boolean exclusive, final boolean autoDelete, final @Nullable Map<String, Object> arguments) {
       super(name, durable, exclusive, autoDelete, arguments);
     }
   }

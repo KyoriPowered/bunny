@@ -1,7 +1,7 @@
 /*
  * This file is part of bunny, licensed under the MIT License.
  *
- * Copyright (c) 2017 KyoriPowered
+ * Copyright (c) 2017-2018 KyoriPowered
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,8 @@
 package net.kyori.bunny.message;
 
 import com.rabbitmq.client.AMQP;
-import net.kyori.blizzard.NonNull;
 import net.kyori.bunny.Subscription;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * A targeted message consumer.
@@ -40,5 +40,5 @@ public interface TargetedMessageConsumer<M extends Message> {
    * @param subscription the subscription
    * @param properties the properties
    */
-  void accept(@NonNull final M message, @NonNull final Subscription subscription, @NonNull final AMQP.BasicProperties properties);
+  void accept(final @NonNull M message, final @NonNull Subscription subscription, final AMQP.@NonNull BasicProperties properties);
 }
